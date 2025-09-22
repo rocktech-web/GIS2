@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dual Web App</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  iframe {
+    border: none;
+    flex: 1;
+  }
+
+  #divider {
+    width: 5px;
+    cursor: ew-resize;
+    background: #333;
+    user-select: none; /* prevent text selection while dragging */
+  }
+
+  .refresh-btn {
+    padding: 5px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .refresh-btn:hover {
+    background: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="panel" id="leftPanel">
+  <button class="refresh-btn" onclick="refreshLeft()">Refresh Left</button>
+  <iframe id="left" src="https://webgis2.mpbhulekh.gov.in"></iframe>
+</div>
+
+<div id="divider" draggable="true"></div>
+
+<div class="panel" id="rightPanel">
+  <button class="refresh-btn" onclick="refreshRight()">Refresh Right</button>
+  <iframe id="right" src="https://rocktechnology-source.github.io/fractiontool"></iframe>
+</div>
+
+<script>
+const divider = document.getElementById('divider');
+const leftPanel = document.getElementById('leftPanel');
+const rightPanel = document.getElementById('rightPanel');
+ const left = document.getElementById('left');
+ const right = document.getElementById('right');
+
+// let isResizing = false;
+
+// Set initial sizes: left 2/3, right 1/3
+function setInitialSizes() {
+  const totalWidth = window.innerWidth;
+  const leftWidth = Math.floor(totalWidth * 2 / 3);
+  leftPanel.style.width = leftWidth + 'px';
+  rightPanel.style.width = (totalWidth - leftWidth - divider.offsetWidth) + 'px';
+}
+setInitialSizes();
+
+// Update on window resize
+window.addEventListener('resize', setInitialSizes);
+
+// Drag to resize
+divider.addEventListener('dragstart', e => {
+  e.dataTransfer.setDragImage(new Image(), 0, 0); // hide ghost image
+});
+
+divider.addEventListener('dragend', e => {
+  const totalWidth = window.innerWidth;
+  let leftWidth = e.pageX; // position where mouse released
+
+  // Prevent panels from being too small
+  const minWidth = 100;
+  if (leftWidth < minWidth) leftWidth = minWidth;
+  if (leftWidth > totalWidth - minWidth - divider.offsetWidth) {
+    leftWidth = totalWidth - minWidth - divider.offsetWidth;
+  }
+
+  leftPanel.style.width = leftWidth + 'px';
+  rightPanel.style.width = (totalWidth - leftWidth - divider.offsetWidth) + 'px';
+});
+
+window.addEventListener('mouseup', () => {
+  isResizing = false;
+  document.body.style.cursor = 'default';
+});
+
+// Refresh functions
+function refreshLeft() {
+  left.src = left.src;
+}
+
+function refreshRight() {
+  right.src = right.src;
+}
+</script>
+</body>
+</html>
